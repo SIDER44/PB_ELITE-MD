@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ELITE-MD · Link your WhatsApp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=DM+Sans:wght@400;500&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--bg:#070b10;--surface:#0e151e;--line:#1c2733;--text:#e8f0f7;--muted:#8b9cad;--brand:#22e5a0;--brand2:#12b6ff;--red:#ff6b6b}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:grid;place-items:center;padding:22px;color:var(--text);
+ font-family:'DM Sans',system-ui,sans-serif;background:
+ radial-gradient(800px 460px at 15% -8%,rgba(34,229,160,.12),transparent 60%),
+ radial-gradient(700px 460px at 100% 0,rgba(18,182,255,.10),transparent 55%),var(--bg)}
+.card{width:100%;max-width:430px;background:linear-gradient(160deg,var(--surface),#0a1017);
+ border:1px solid var(--line);border-radius:22px;padding:30px;box-shadow:0 30px 70px -40px #000}
+.logo{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--brand),var(--brand2));
+ display:grid;place-items:center;color:#04120c;font-weight:800;font-size:20px;font-family:'Sora'}
+h1{font-family:'Sora',sans-serif;font-size:21px;margin:18px 0 6px}
+p{color:var(--muted);font-size:14px;line-height:1.6;margin:0 0 20px}
+input{width:100%;padding:14px;border-radius:13px;border:1px solid var(--line);background:#070b10;color:#fff;font-size:16px;outline:none}
+input:focus{border-color:var(--brand)}
+button{width:100%;margin-top:12px;padding:14px;border:none;border-radius:13px;background:linear-gradient(135deg,var(--brand),#13c78c);
+ color:#04120c;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit}
+button:disabled{opacity:.55;cursor:not-allowed}
+.code{font-family:'JetBrains Mono',monospace;font-size:32px;letter-spacing:.16em;color:var(--brand);text-align:center;
+ padding:20px;background:#070b10;border-radius:15px;border:1px dashed rgba(34,229,160,.42);margin-top:18px}
+.steps{margin:16px 0 0;padding-left:18px;color:var(--muted);font-size:13.5px;line-height:1.8}
+.err{color:var(--red);font-size:14px;margin-top:14px}
+.ok{text-align:center}
+.badge{display:inline-flex;gap:8px;align-items:center;font-size:12.5px;color:var(--muted);border:1px solid var(--line);
+ padding:6px 12px;border-radius:999px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--brand);box-shadow:0 0 0 4px rgba(34,229,160,.16)}
+</style>
+</head>
+<body>
+<div class="card" id="card">
+  <div class="logo">E</div>
+  <h1>Link your WhatsApp</h1>
+  <p>Enter your number with country code (digits only). You'll get an 8-character code to type into WhatsApp.</p>
+  <input id="num" inputmode="numeric" placeholder="e.g. 254712345678" autofocus>
+  <button id="btn" onclick="pair()">Get pairing code</button>
+  <div id="out"></div>
+  <ol class="steps">
+    <li>Open WhatsApp on your phone</li>
+    <li>Settings → Linked devices</li>
+    <li>Link a device → <b>Link with phone number instead</b></li>
+    <li>Type the code shown here</li>
+  </ol>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+async function poll() {
+  try {
+    const s = await (await fetch('/api/pairing-status')).json();
+    if (s.connected) {
+      $('card').innerHTML = `<div class="ok"><div class="logo" style="margin:0 auto">E</div>
+        <h1>Already linked</h1>
+        <p>This bot is connected${s.phoneNumber ? ' as <b>+' + s.phoneNumber + '</b>' : ''}. Open the control-centre link from your host console to manage it.</p>
+        <span class="badge"><span class="dot"></span>online</span></div>`;
+    }
+  } catch {}
+}
+poll(); setInterval(poll, 6000);
+async function pair() {
+  const number = $('num').value.replace(/[^0-9]/g, '');
+  if (number.length < 8) { $('out').innerHTML = '<p class="err">Enter a valid number with country code.</p>'; return; }
+  $('btn').disabled = true; $('out').innerHTML = '<p style="margin-top:14px">Requesting code…</p>';
+  try {
+    const r = await (await fetch('/api/pair', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ number }) })).json();
+    $('btn').disabled = false;
+    $('out').innerHTML = r.code
+      ? `<div class="code">${r.code}</div>`
+      : `<p class="err">${(r.error || 'Failed to get a code')}</p>`;
+  } catch (e) {
+    $('btn').disabled = false;
+    $('out').innerHTML = `<p class="err">${e.message}</p>`;
+  }
+}
+</script>
+</body>
+</html>

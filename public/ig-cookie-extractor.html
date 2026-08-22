@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ELITE MD - Instagram Cookie Extractor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #fff;
+        }
+        .container {
+            max-width: 500px;
+            background: rgba(25, 25, 45, 0.95);
+            border: 2px solid #00d4ff;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.2);
+            animation: glow 2s ease-in-out infinite;
+        }
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 40px rgba(0, 212, 255, 0.2); }
+            50% { box-shadow: 0 0 60px rgba(255, 0, 255, 0.3); }
+        }
+        h1 {
+            color: #00d4ff;
+            margin-bottom: 10px;
+            text-align: center;
+            font-size: 28px;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+        .subtitle {
+            text-align: center;
+            color: #ff00ff;
+            margin-bottom: 30px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .step {
+            margin-bottom: 30px;
+            padding: 15px;
+            background: rgba(0, 212, 255, 0.05);
+            border-left: 3px solid #00d4ff;
+            border-radius: 5px;
+        }
+        .step-num {
+            color: #00d4ff;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .step-text {
+            color: #ccc;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .code-block {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #00d4ff;
+            padding: 12px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #00ff00;
+            overflow-x: auto;
+            word-break: break-all;
+        }
+        .output-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #ff00ff;
+            border-radius: 8px;
+            display: none;
+        }
+        .output-section.show {
+            display: block;
+        }
+        .output-label {
+            color: #ff00ff;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+        .cookie-output {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 12px;
+            border-radius: 5px;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            word-break: break-all;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            background: linear-gradient(135deg, #00d4ff, #ff00ff);
+            border: none;
+            color: #fff;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        button:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+        .success {
+            color: #00ff00;
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+            display: none;
+        }
+        .success.show {
+            display: block;
+        }
+        .info-box {
+            background: rgba(255, 215, 0, 0.1);
+            border-left: 3px solid #ffd700;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            font-size: 12px;
+            color: #ffd700;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📸 ELITE MD</h1>
+        <div class="subtitle">Instagram Cookie Extractor</div>
+
+        <div class="info-box">
+            ⚠️ This tool extracts YOUR OWN Instagram cookies for personal use only
+        </div>
+
+        <div class="step">
+            <div class="step-num">Step 1️⃣</div>
+            <div class="step-text">
+                Click the button below to extract your cookies
+                <br><br>
+                <em>(Make sure you're logged into Instagram)</em>
+            </div>
+        </div>
+
+        <button onclick="extractCookies()">🔓 EXTRACT MY COOKIES</button>
+
+        <div class="output-section" id="outputSection">
+            <div class="output-label">🔐 Your Instagram Cookies:</div>
+            <div class="cookie-output" id="cookieOutput"></div>
+            <button onclick="copyCookies()">📋 COPY TO CLIPBOARD</button>
+            <div class="success" id="successMsg">✅ Copied! Paste in WhatsApp: .setiscookie &lt;paste-here&gt;</div>
+        </div>
+    </div>
+
+    <script>
+        function extractCookies() {
+            const cookies = document.cookie;
+            if (!cookies) {
+                alert('❌ No cookies found. Make sure you logged into Instagram on this browser!');
+                return;
+            }
+            
+            document.getElementById('cookieOutput').textContent = cookies;
+            document.getElementById('outputSection').classList.add('show');
+            document.getElementById('successMsg').classList.remove('show');
+        }
+
+        function copyCookies() {
+            const cookieText = document.getElementById('cookieOutput').textContent;
+            navigator.clipboard.writeText(cookieText).then(() => {
+                document.getElementById('successMsg').classList.add('show');
+                setTimeout(() => {
+                    document.getElementById('successMsg').classList.remove('show');
+                }, 3000);
+            }).catch(() => {
+                alert('Failed to copy. Try manual selection.');
+            });
+        }
+    </script>
+</body>
+</html>
